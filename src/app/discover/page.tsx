@@ -26,7 +26,7 @@ export default function DiscoverPage() {
     setFetching(true)
     const supabase = createClient()
     if (user) {
-      await supabase.rpc('update_my_location', { user_lat: lat, user_lng: lng }).catch(() => {})
+      try { await supabase.rpc('update_my_location', { user_lat: lat, user_lng: lng }) } catch { }
     }
     const { data } = await supabase.rpc('get_nearby_users', { user_lat: lat, user_lng: lng, radius_km: 5 })
     setUsers((data ?? []) as NearbyUser[])
