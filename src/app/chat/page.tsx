@@ -47,7 +47,7 @@ export default function ChatListPage() {
         .eq('conversation_id', conv.id)
         .neq('user_id', user.id)
         .single()
-      result.push({ ...conv, other_user: (other as any)?.profile })
+      result.push({ ...(conv as any), other_user: (other as any)?.profile } as any)
     }
     setConversations(result)
     setLoading(false)
