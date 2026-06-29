@@ -16,7 +16,7 @@ export function useAuth() {
       setUser(session?.user ?? null)
       if (session?.user) {
         supabase.from('profiles').select('*').eq('id', session.user.id).single()
-          .then(({ data }) => { setProfile(data); setLoading(false) })
+          .then(({ data }) => { setProfile(data as Profile | null); setLoading(false) })
       } else {
         setLoading(false)
       }
@@ -26,7 +26,7 @@ export function useAuth() {
       setUser(session?.user ?? null)
       if (session?.user) {
         supabase.from('profiles').select('*').eq('id', session.user.id).single()
-          .then(({ data }) => setProfile(data))
+          .then(({ data }) => setProfile(data as Profile | null))
       } else {
         setProfile(null)
       }

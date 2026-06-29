@@ -31,7 +31,7 @@ export default function ChatListPage() {
       .eq('user_id', user.id)
 
     if (!data?.length) { setLoading(false); return }
-    const ids = data.map(r => r.conversation_id)
+    const ids = data.map((r: any) => r.conversation_id)
 
     const { data: convs } = await supabase
       .from('conversations')
@@ -70,7 +70,9 @@ export default function ChatListPage() {
 
       <div>
         {loading ? (
-          <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+          </div>
         ) : conversations.length === 0 ? (
           <div className="text-center py-20 px-5">
             <div className="text-5xl mb-4">💬</div>
@@ -84,13 +86,15 @@ export default function ChatListPage() {
           return (
             <Link key={conv.id} href={`/chat/${conv.id}`} className="flex items-center gap-3 px-4 py-4 hover:bg-dark-800/50 border-b border-dark-400/30 transition">
               <div className="relative flex-shrink-0">
-                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${avatarColor(other?.username)} flex items-center justify-center font-bold text-white`}>{getInitials(name)}</div>
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${avatarColor(other?.username)} flex items-center justify-center font-bold text-white`}>
+                  {getInitials(name)}
+                </div>
                 {other?.is_online && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-dark-900" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center mb-0.5">
                   <span className="font-semibold text-sm">{name}</span>
-                  <span className="text-[10px] text-dark-300">{conv.last_message_at?formatTime(conv.last_message_at):''}</span>
+                  <span className="text-[10px] text-dark-300">{conv.last_message_at ? formatTime(conv.last_message_at) : ''}</span>
                 </div>
                 <p className="text-xs text-dark-300 truncate">{conv.last_message ?? 'Start chatting…'}</p>
               </div>

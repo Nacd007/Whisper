@@ -20,7 +20,7 @@ export function useMessages(conversationId: string) {
       .order('created_at', { ascending: true })
       .limit(200)
       .then(({ data }) => {
-        const msgs = (data ?? []) as Message[]
+        const msgs = (data as unknown as Message[]) ?? []
         msgs.forEach(m => seen.current.add(m.id))
         setMessages(msgs)
         setLoading(false)
@@ -29,7 +29,10 @@ export function useMessages(conversationId: string) {
 
     const channel = supabase
       .channel(`msgs-${conversationId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, async (payload) => {
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`
+      }, async (payload) => {
         const id = payload.new.id as string
         if (seen.current.has(id)) return
         seen.current.add(id)
@@ -37,7 +40,7 @@ export function useMessages(conversationId: string) {
           .select('*, sender:profiles(id,username,display_name,avatar_url,is_anonymous)')
           .eq('id', id).single()
         if (data) {
-          setMessages(prev => [...prev, data as Message])
+          setMessages(prev => [...prev, data as unknown as Message])
           setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
         }
       })
@@ -51,7 +54,11 @@ export function useMessages(conversationId: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     if (payload.type === 'text' && payload.content && payload.content.length > 2000) throw new Error('Too long')
-    const { error } = await supabase.from('messages').insert({ conversation_id: conversationId, sender_id: user.id, ...payload })
+    const { error } = await supabase.from('messages').insert({
+      conversation_id: conversationId,
+      sender_id: user.id,
+      ...payload,
+    })
     if (error) throw error
   }
 
