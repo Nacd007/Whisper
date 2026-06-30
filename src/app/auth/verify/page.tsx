@@ -1,10 +1,10 @@
 'use client'
-import { useRef, useState } from 'react'
+import { Suspense, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
-export default function VerifyPage() {
+function VerifyForm() {
   const [digits, setDigits] = useState(['','','','','',''])
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
@@ -51,24 +51,32 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-dark-900">
-      <div className="w-full max-w-sm text-center">
-        <div className="w-16 h-16 rounded-2xl bg-teal-500/20 border border-teal-500/50 flex items-center justify-center text-3xl mx-auto mb-4">✉️</div>
-        <h1 className="text-2xl font-bold mb-2">Check your email</h1>
-        <p className="text-dark-300 text-sm mb-1">6-digit code sent to</p>
-        <p className="text-teal-400 font-semibold text-sm mb-8">{email}</p>
-        <div className="flex gap-2.5 justify-center mb-6">
-          {digits.map((d,i) => (
-            <input key={i} ref={el=>{inputs.current[i]=el}} type="number" inputMode="numeric" maxLength={1} value={d}
-              onChange={e=>handleChange(i,e.target.value)} onKeyDown={e=>handleKey(i,e)} disabled={loading||done}
-              className="w-12 h-14 text-center text-2xl font-bold bg-dark-800 border-2 border-dark-400 rounded-xl text-teal-400 outline-none focus:border-teal-500 transition disabled:opacity-50" />
-          ))}
-        </div>
-        <button onClick={()=>verify(digits.join(''))} disabled={digits.join('').length<6||loading||done} className="btn-primary mb-4">
-          {loading?'Verifying…':done?'Done!':'Verify & continue'}
-        </button>
-        <p className="text-sm text-dark-300">Didn&apos;t get it? <button onClick={resend} className="text-teal-400 font-semibold">Resend</button></p>
+    <div className="w-full max-w-sm text-center">
+      <div className="w-16 h-16 rounded-2xl bg-teal-500/20 border border-teal-500/50 flex items-center justify-center text-3xl mx-auto mb-4">✉️</div>
+      <h1 className="text-2xl font-bold mb-2">Check your email</h1>
+      <p className="text-dark-300 text-sm mb-1">6-digit code sent to</p>
+      <p className="text-teal-400 font-semibold text-sm mb-8">{email}</p>
+      <div className="flex gap-2.5 justify-center mb-6">
+        {digits.map((d,i) => (
+          <input key={i} ref={el=>{inputs.current[i]=el}} type="number" inputMode="numeric" maxLength={1} value={d}
+            onChange={e=>handleChange(i,e.target.value)} onKeyDown={e=>handleKey(i,e)} disabled={loading||done}
+            className="w-12 h-14 text-center text-2xl font-bold bg-dark-800 border-2 border-dark-400 rounded-xl text-teal-400 outline-none focus:border-teal-500 transition disabled:opacity-50" />
+        ))}
       </div>
+      <button onClick={()=>verify(digits.join(''))} disabled={digits.join('').length<6||loading||done} className="btn-primary mb-4">
+        {loading?'Verifying…':done?'Done!':'Verify & continue'}
+      </button>
+      <p className="text-sm text-dark-300">Didn&apos;t get it? <button onClick={resend} className="text-teal-400 font-semibold">Resend</button></p>
+    </div>
+  )
+}
+
+export default function VerifyPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-dark-900">
+      <Suspense fallback={<div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />}>
+        <VerifyForm />
+      </Suspense>
     </div>
   )
 }
